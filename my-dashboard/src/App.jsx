@@ -23,60 +23,67 @@ function FinancialDashboard() {
   const [search, setSearch] = useState("AMC");
 
   return (
-    <div className="p-8 space-y-6 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-bold">Financial Analysis</h1>
-      <p className="text-gray-500">Real-time market insights and analysis</p>
+  <div className="dark p-8 space-y-6 bg-gray-950 min-h-screen">
+    <div className="flex relative flex-row items-center mb-10">
+      <div>
+        <h1 className="text-white text-4xl font-bold">FinSight</h1>
+        <p className="text-white">AI insights for real-world finance</p>
+      </div>
 
       {/* Search bar */}
-      <div className="flex items-center gap-2">
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Enter company name..."
-          className="max-w-sm"
-        />
-        <Button>Search</Button>
+      <div className="flex items-center gap-2 ml-auto w-full max-w-md min-w-0">
+        <div className="flex items-center gap-2 w-full min-w-0">
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Enter company name..."
+            className="flex-1 min-w-0 text-white bg-slate-900 border-gray-700 focus:border-blue-500 focus:ring-blue-500"
+          />
+          <Button className="bg-slate-900 text-white border-gray-700 hover:bg-gray-700">Search</Button>
+        </div>
       </div>
+    </div>
+      
 
       {/* Top Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
+        <Card className="dark">
           <CardHeader>
-            <CardTitle>Chiffre d'affaires (Revenue)</CardTitle>
+            <CardTitle>Turnover (Revenue)</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold">$4.49B</p>
-            <p className="mt-[5px] text-sm text-neutral-500">0.0%</p>
+            <p className="mt-[5px] text-sm text-neutral-300">0.0%</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dark">
           <CardHeader>
             <CardTitle>Market Sentiment</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl text-green-600 font-semibold">72.0%</p>
-            <p className="text-sm text-gray-500">Positive</p>
+            <p className="text-sm text-gray-300">Positive</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dark">
           <CardHeader>
             <CardTitle>Free Cash Flow (FCF)</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-1 items-">
             <p className="text-2xl font-semibold">-$181.61M</p>
-            <p className="text-sm text-gray-500">FCF Margin: -4.0%</p>
+            <p className="text-sm text-gray-300">FCF Margin: -4.0%</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dark">
           <CardHeader>
             <CardTitle>Risk Level</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold text-red-600">Very High</p>
-            <p className="mt-[5px] text-sm text-gray-500">Beta: 0.60</p>
+            <p className="mt-[5px] text-sm text-gray-300">Beta: 0.60</p>
           </CardContent>
         </Card>
       </div>
@@ -84,16 +91,39 @@ function FinancialDashboard() {
       {/* Chart and Company Info Section */}
       <div className="space-y-6">
         {/* Chart Section */}
-        <Card>
+        <Card className="dark">
           <CardHeader>
             <CardTitle>Stock Price Movement of {search}</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={350}>
-              <LineChart data={sampleData}>
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
+            <ResponsiveContainer width="100%" height={350} className="mx-auto">
+              <LineChart data={sampleData} margin={{ left: 48, right: 40, top: 10, bottom: 0 }}>
+                <XAxis
+                  dataKey="date"
+                  stroke="#e5e7eb"
+                  axisLine={{ stroke: '#e5e7eb' }}
+                  tickLine={{ stroke: '#e5e7eb' }}
+                  height={70}
+                  tick={{ fill: '#e5e7eb', angle: -45, textAnchor: 'end', dy: 5 }}
+                />
+                <YAxis
+                  stroke="#e5e7eb"
+                  tick={{ fill: '#e5e7eb' }}
+                  axisLine={{ stroke: '#e5e7eb' }}
+                  tickLine={{ stroke: '#e5e7eb' }}
+                  label={{ value: 'Price ($)', angle: -90, position: 'insideLeft', dx: -2, fill: '#e5e7eb', dy:25 }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#0f172a',
+                    color: '#ffffff',
+                    borderRadius: 8,
+                    padding: '0.5rem',
+                    border: 'solid gray-900',
+                  }}
+                  itemStyle={{ color: '#ffffff' }}
+                  labelStyle={{ color: '#ffffff' }}
+                />
                 <Line type="monotone" dataKey="price" stroke="#2563eb" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
@@ -103,56 +133,56 @@ function FinancialDashboard() {
         {/* Key Metrics and Public Sentiment Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Market Sentiment Card */}
-          <Card>
+          <Card className="dark">
             <CardHeader>
               <CardTitle>Market Sentiment</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Overall Sentiment */}
               <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-3">Market Direction</h3>
+                <h3 className="text-sm font-medium small-text-card mb-3">Market Direction</h3>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Positive</span>
+                    <span className="small-text-card">Positive</span>
                     <span className="font-medium text-green-600">72%</span>
                   </div>
-                  <div className="w-full bg-gray-200 h-2 rounded-full">
+                  <div className="w-full bg-gray-400 h-2 rounded-full">
                     <div className="bg-green-500 h-2 rounded-full w-[72%]" />
                   </div>
                   
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Other</span>
-                    <span className="font-medium text-neutral-600">28%</span>
+                    <span className="small-text-card">Other</span>
+                    <span className="font-medium small-text-card">28%</span>
                   </div>
-                  <div className="w-full bg-gray-200 h-2 rounded-full">
-                    <div className="bg-neutral-500 h-2 rounded-full w-[28%]" />
+                  <div className="w-full bg-gray-400 h-2 rounded-full">
+                    <div className="bg-neutral-700 h-2 rounded-full w-[28%]" />
                   </div>
                 </div>
               </div>
 
               {/* Source Analysis */}
               <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-3">Source Analysis</h3>
+                <h3 className="text-sm font-medium small-text-card mb-3">Source Analysis</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <h4 className="text-sm font-medium text-gray-500">Analysts</h4>
+                    <h4 className="text-sm font-medium small-text-card">Analysts</h4>
                     <p className="text-lg font-semibold text-green-600">82%</p>
-                    <p className="text-xs text-gray-500">Strong Buy</p>
+                    <p className="text-xs small-text-card">Strong Buy</p>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-gray-500">News</h4>
+                    <h4 className="text-sm font-medium small-text-card">News</h4>
                     <p className="text-lg font-semibold text-green-600">75%</p>
-                    <p className="text-xs text-gray-500">Positive</p>
+                    <p className="text-xs small-text-card">Positive</p>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-gray-500">Social</h4>
+                    <h4 className="text-sm font-medium small-text-card">Social</h4>
                     <p className="text-lg font-semibold text-yellow-600">65%</p>
-                    <p className="text-xs text-gray-500">Moderate</p>
+                    <p className="text-xs small-text-card">Moderate</p>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-gray-500">Forums</h4>
+                    <h4 className="text-sm font-medium small-text-card">Forums</h4>
                     <p className="text-lg font-semibold text-green-600">78%</p>
-                    <p className="text-xs text-gray-500">Bullish</p>
+                    <p className="text-xs small-text-card">Bullish</p>
                   </div>
                 </div>
               </div>
@@ -160,29 +190,29 @@ function FinancialDashboard() {
           </Card>
 
           {/* Key Metrics Card */}
-          <Card>
+          <Card className="dark">
             <CardHeader>
               <CardTitle>Key Metrics</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Fundamental Metrics */}
               <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-3">Fundamental</h3>
+                <h3 className="text-sm font-medium small-text-card mb-3">Fundamental</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <h4 className="text-sm font-medium text-gray-500">P/E Ratio</h4>
+                    <h4 className="text-sm font-medium small-text-card">P/E Ratio</h4>
                     <p className="text-lg font-semibold">15.2x</p>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-gray-500">Beta</h4>
+                    <h4 className="text-sm font-medium small-text-card">Beta</h4>
                     <p className="text-lg font-semibold">0.60</p>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-gray-500">Margin</h4>
+                    <h4 className="text-sm font-medium small-text-card">Margin</h4>
                     <p className="text-lg font-semibold">18.3%</p>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-gray-500">Rating</h4>
+                    <h4 className="text-sm font-medium small-text-card">Rating</h4>
                     <p className="text-lg font-semibold">BBB+</p>
                   </div>
                 </div>
@@ -190,27 +220,27 @@ function FinancialDashboard() {
 
               {/* Technical Metrics */}
               <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-3">Technical</h3>
+                <h3 className="text-sm font-medium small-text-card mb-3">Technical</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <h4 className="text-sm font-medium text-gray-500">RSI (14d)</h4>
+                    <h4 className="text-sm font-medium small-text-card">RSI (14d)</h4>
                     <p className="text-lg font-semibold text-green-600">65.2</p>
-                    <p className="text-xs text-gray-500">Strong Momentum</p>
+                    <p className="text-xs small-text-card">Strong Momentum</p>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-gray-500">MACD</h4>
+                    <h4 className="text-sm font-medium small-text-card">MACD</h4>
                     <p className="text-lg font-semibold text-green-600">+0.42</p>
-                    <p className="text-xs text-gray-500">Bullish Signal</p>
+                    <p className="text-xs small-text-card">Bullish Signal</p>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-gray-500">Volume Ratio</h4>
+                    <h4 className="text-sm font-medium small-text-card">Volume Ratio</h4>
                     <p className="text-lg font-semibold text-blue-600">1.85x</p>
-                    <p className="text-xs text-gray-500">Above Average</p>
+                    <p className="text-xs small-text-card">Above Average</p>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-gray-500">Volatility</h4>
+                    <h4 className="text-sm font-medium small-text-card">Volatility</h4>
                     <p className="text-lg font-semibold text-yellow-600">32.5%</p>
-                    <p className="text-xs text-gray-500">30d Average</p>
+                    <p className="text-xs small-text-card">30d Average</p>
                   </div>
                 </div>
               </div>
@@ -221,13 +251,13 @@ function FinancialDashboard() {
         {/* Market Position and Investment Portfolio */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Market Position Card */}
-          <Card>
+          <Card className="dark">
             <CardHeader>
               <CardTitle>Market Position</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h4 className="text-sm font-medium text-gray-500">Main Rivals</h4>
+                <h4 className="text-sm font-medium small-text-card">Main Rivals</h4>
                 <div className="mt-1 space-y-1">
                   <div className="flex justify-between items-center">
                     <p className="text-sm font-medium">Netflix</p>
@@ -244,7 +274,7 @@ function FinancialDashboard() {
                 </div>
               </div>
               <div>
-                <h4 className="text-sm font-medium text-gray-500">Strategic Partners</h4>
+                <h4 className="text-sm font-medium small-text-card">Strategic Partners</h4>
                 <div className="mt-1 space-y-1">
                   <div className="flex justify-between items-center">
                     <p className="text-sm font-medium">Disney</p>
@@ -260,20 +290,20 @@ function FinancialDashboard() {
           </Card>
 
           {/* Investment Portfolio Card */}
-          <Card>
+          <Card className="dark">
             <CardHeader>
               <CardTitle>Investment Portfolio</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h4 className="text-sm font-medium text-gray-500">Major Investments</h4>
+                <h4 className="text-sm font-medium small-text-card">Major Investments</h4>
                 <div className="mt-2 space-y-3">
                   <div>
                     <div className="flex justify-between items-center mb-1">
                       <p className="text-sm font-medium">Digital Projection Technology</p>
                       <span className="text-xs font-medium text-green-500">15% Stake</span>
                     </div>
-                    <div className="w-full bg-gray-200 h-2 rounded-full">
+                    <div className="w-full bg-gray-400 h-2 rounded-full">
                       <div className="bg-green-500 h-2 rounded-full w-[15%]" />
                     </div>
                   </div>
@@ -282,7 +312,7 @@ function FinancialDashboard() {
                       <p className="text-sm font-medium">Streaming Platform</p>
                       <span className="text-xs font-medium text-blue-500">8% Stake</span>
                     </div>
-                    <div className="w-full bg-gray-200 h-2 rounded-full">
+                    <div className="w-full bg-gray-400 h-2 rounded-full">
                       <div className="bg-blue-500 h-2 rounded-full w-[8%]" />
                     </div>
                   </div>
@@ -291,14 +321,14 @@ function FinancialDashboard() {
                       <p className="text-sm font-medium">VR Entertainment</p>
                       <span className="text-xs font-medium text-purple-500">5% Stake</span>
                     </div>
-                    <div className="w-full bg-gray-200 h-2 rounded-full">
+                    <div className="w-full bg-gray-400 h-2 rounded-full">
                       <div className="bg-purple-500 h-2 rounded-full w-[5%]" />
                     </div>
                   </div>
                 </div>
               </div>
               <div className="pt-2">
-                <h4 className="text-sm font-medium text-gray-500">Investment Strategy</h4>
+                <h4 className="text-sm font-medium small-text-card">Investment Strategy</h4>
                 <p className="text-xs text-gray-600 mt-1">
                   Focused on next-gen entertainment technology and digital transformation initiatives
                 </p>
