@@ -1,10 +1,12 @@
+import os
 import boto3
 import instructor
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
-from datetime import datetime
-from textwrap import wrap
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
+
+MAX_WORKERS = int((1 * os.cpu_count())/3)
 
 # Initialized instructor with Bedrock
 bedrock_client = boto3.client('bedrock-runtime', region_name='us-west-2')
@@ -66,21 +68,25 @@ class RegulatoryAnalysis(BaseModel):
     primary_subject: str = Field(..., description="The main topic of the law")
     key_requirements_summary: str = Field(..., description="A concise summary of the 3-5 main obligations or requirements")
     affected_sectors: List[str] = Field(..., description="List of industries most directly impacted")
-    potential_impact_severity: str = Field(..., description="Low, Medium, or High")
+    potential_impact_severity: str = Field(..., description="Low, Medium, or High, Estimate of the regulatory burden or market disruption.")
     # ADD these fields for S&P 500 analysis:
-    specific_companies_mentioned: List[str] = Field(default=[], description="List any S&P 500 companies explicitly mentioned")
+    specific_companies_mentioned: List[str] = Field(default=[], description="List of S&P 500 companies explicitly mentioned")
+    companies_that_could_be_impacted: List[str] = Field(default=[], description="List of companies that could be impacted")
     compliance_deadline: Optional[str] = Field(None, description="Key implementation dates or deadlines")
-    estimated_compliance_cost: Optional[str] = Field(None, description="Any mentioned compliance costs or budget allocations")
+    estimated_compliance_cost: Optional[str] = Field(None, description="Any mentioned compliance costs or budget allocations or close estimation based on the directive")
 
+class SummaryModel(BaseModel):
+    summary: str = Field(..., description="Summary of the batch text document")
 
 # --- Helper Class (Updated with new method) ---
 
 class BedrockInstructorHelper:
     """Helper for structured extraction with Bedrock + Instructor"""
 
-    def __init__(self, model: str = "global.anthropic.claude-haiku-4-5-20251001-v1:0"):
+    def __init__(self, model: str = "global.anthropic.claude-sonnet-4-5-20250929-v1:0"):
         self.client = client
         self.model = model
+        self.MAX_CHARS_PER_CALL = 150_000
 
     def extract_10k_info(self, filing_text: str) -> dict:
         """Extract administrative info from cover/Part I."""
@@ -159,6 +165,83 @@ class BedrockInstructorHelper:
         except Exception as e:
             print(f"Error analyzing regulatory document: {e}")
             return {}
+
+    # summarize to handle longer texts for multilingual texts
+    def summarize_text(
+            self,
+            text: str,
+            max_workers: int = MAX_WORKERS,
+            max_chunks_per_call: int = 80,
+            chunk_size: int = 8192
+    ) -> str:
+        """
+        Summarize a large document efficiently using internal chunking and parallel batches.
+
+        Args:
+            text: Full raw text of the document.
+            max_workers: Number of parallel threads for summarization.
+            max_chunks_per_call: Maximum number of chunks per single API call.
+            chunk_size: Character size per chunk for splitting.
+
+        Returns:
+            Ordered combined summary of the document.
+        """
+        text = text.strip()
+        if not text:
+            return ""
+
+        # --- Step 1: Split text into character chunks ---
+        chunks = [text[i:i + chunk_size] for i in range(0, len(text), chunk_size)]
+
+        # --- Step 2: Split chunks into batches of <= max_chunks_per_call ---
+        batches = [chunks[i:i + max_chunks_per_call] for i in range(0, len(chunks), max_chunks_per_call)]
+        batch_summaries = [""] * len(batches)
+
+        # --- Step 3: Function to summarize a batch ---
+        def summarize_batch(batch_idx, batch_chunks):
+            batch_text = " ".join(batch_chunks)
+            prompt = f"Batch {batch_idx + 1}/{len(batches)} | Summarize this text concisely in English while preserving all key information:\n{batch_text}"
+            try:
+                response = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=[{"role": "user", "content": prompt}],
+                    response_model=SummaryModel,
+                    max_retries=2
+                )
+                return batch_idx, response.model_dump().get("summary", "").strip()
+            except Exception as e:
+                print(f"Error summarizing batch {batch_idx + 1}: {e}")
+                return batch_idx, batch_text  # fallback
+
+        # --- Step 4: Parallel execution with proper ordering ---
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_to_index = {executor.submit(summarize_batch, i, batch): i for i, batch in enumerate(batches)}
+            for future in as_completed(future_to_index):
+                idx, summary = future.result()
+                batch_summaries[idx] = summary or ""
+
+        # --- Step 5: Combine batch summaries in correct order ---
+        combined_summary = " ".join(batch_summaries)
+
+        # --- Step 6: Final summarization if still too long ---
+        max_total_length = max_chunks_per_call * chunk_size
+        if len(combined_summary) <= max_total_length:
+            return combined_summary
+        else:
+            print(f"Combined summary length {len(combined_summary)} exceeds {max_total_length}, summarizing again...")
+            try:
+                final_prompt = f"Summarize the following text concisely in English while preserving all key information:\n{combined_summary}"
+                response = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=[{"role": "user", "content": final_prompt}],
+                    response_model=SummaryModel,
+                    max_retries=2
+                )
+                return response.model_dump().get("summary", "").strip()
+            except Exception as e:
+                print(f"Error during final summarization: {e}")
+                return combined_summary  # fallback
+
 
 class BedrockEmbeddingHelper:
     def __init__(self, model_id: str = "amazon.titan-embed-text-v2:0", region: str = "us-west-2"):
