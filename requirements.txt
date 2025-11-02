@@ -1,0 +1,7 @@
+pandas
+requests
+tqdm
+boto3
+instructor[bedrock]
+strands-agents
+strands-agents-tools
