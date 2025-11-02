@@ -327,12 +327,6 @@ function FinancialDashboard() {
                   </div>
                 </div>
               </div>
-              <div className="pt-2">
-                <h4 className="text-sm font-medium small-text-card">Investment Strategy</h4>
-                <p className="text-xs text-gray-600 mt-1">
-                  Focused on next-gen entertainment technology and digital transformation initiatives
-                </p>
-              </div>
             </CardContent>
           </Card>
         </div>
