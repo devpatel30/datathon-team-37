@@ -136,3 +136,33 @@ The following is the combined version you can zoom in and out and interact with 
 hover on the nodes to see the Ticker, the color determines the semantic similarity.
     ![img_3.png](img_3.png)
 #### You can also change the similarity level by changing the row["similarity"] variable.
+
+# Build guide
+1. Install requirements
+```bash
+  pip install -r requirements.txt
+```
+2. Merge datasets
+```bash
+  python .\src\data\combine_sp500_data.py
+```
+3. Run ingestion_pipeline in order as given
+```bash
+  python .\src\ingestion_pipeline.py --mode stage --doc_type filing
+```
+ ```bash
+  python .\src\ingestion_pipeline.py --mode extract --doc_type filing
+```
+```bash
+  python .\src\ingestion_pipeline.py --mode stage --doc_type regulation
+```
+```bash
+  python .\src\ingestion_pipeline.py --mode extract --doc_type regulation
+```
+--mode stage gives chunks and embeddings of the documents
+--mode extract calls llm model and gives response and they are located in src/data/structured_data
+the data inside gives valuable insights to about the company and the directives depending on which files you  are looking
+
+See sample_data folder given 
+
+4. Lastly for visualizing and interacting with the companies go to semantic_analysis.ipynb and run everything it will give you the node network you can interact with them the color of node is determined by clustering and node length is the cosing similarity length between them.
