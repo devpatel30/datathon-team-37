@@ -9,6 +9,7 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Visualizations are served from /public/visualizations automatically by Vite
   build: {
     commonjsOptions: {
       transformMixedEsModules: true,
