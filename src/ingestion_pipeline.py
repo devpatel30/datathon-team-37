@@ -16,7 +16,7 @@ from threading import Lock
 warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
 # ---------------- CONFIG ----------------
-MAX_CHUNK_SIZE = 8192
+MAX_CHUNK_SIZE = 6500
 
 # Directories
 PROJECT_ROOT = Path(__file__).parent.parent
