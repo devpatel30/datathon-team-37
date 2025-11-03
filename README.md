@@ -4,6 +4,8 @@
 
 This project provides a **two-stage processing pipeline** to analyze financial filings and regulatory texts for companies, specifically focusing on S&P 500 stocks. It leverages **Bedrock** to summarize and extract structured data from large multilingual documents.
 
+Additionally, it provides **semantic network analysis** for companies and directives, allowing visualization of relationships based on embeddings and clustering.
+
 ---
 
 ## Dataset
@@ -67,6 +69,24 @@ The pipeline consists of **two main stages**:
 
 ---
 
+## Semantic Network & Clustering
+
+The project now includes **graph-based semantic analysis** of companies and directives:
+
+- **Nodes** represent **companies** or **directives**.  
+- **Edges** reflect **semantic similarity** based on embeddings.  
+- **Node sizes** dynamically scale with the number of connections to highlight central companies or directives.  
+- **Company nodes** are clustered based on embedding similarity, allowing patterns to emerge visually.  
+- **Interactive 3D visualizations** allow:
+  - Hovering to see node names.
+  - Selecting a company to see its **top-k closest companies** and connected directives.
+  - Selecting a directive to see its **top-k closest companies** and related directives.
+  - Irrelevant nodes and edges are dimmed or hidden to focus on relevant relationships.
+
+This feature enables **exploration of regulatory impacts** and **company relationships** in a semantic space without showing cluttered edges.
+
+---
+
 ## Output
 
 ### Filings (`filing_structured.csv`)
@@ -76,13 +96,11 @@ address,phone_number,exchange,primary_sector,revenue,net_income,operating_cash_f
 capital_expenditure,eps,pe_ratio,risk_level,top_3_risk_factors,mitigation_suggestions,
 confidence_score,key_rivals,competitive_advantage,key_partners,major_investments_acquisitions
 
-
 ### Regulations (`regulations_structured.csv`)
 
 file_name,country_region,law_name,primary_subject,key_requirements_summary,
 affected_sectors,potential_impact_severity,specific_companies_mentioned,
 companies_that_could_be_impacted,compliance_deadline,estimated_compliance_cost
-
 
 ---
 
@@ -92,6 +110,7 @@ companies_that_could_be_impacted,compliance_deadline,estimated_compliance_cost
 - Incremental CSV saving ensures **fault tolerance**.  
 - Fully parallel extraction using LLM summaries.  
 - Designed for **S&P 500 filings and regulations**, but can be extended to other datasets.  
+- **Semantic network visualization** with dynamic sizing, clustering, and top-k focus for companies and directives.
 
 ---
 
@@ -100,10 +119,20 @@ companies_that_could_be_impacted,compliance_deadline,estimated_compliance_cost
 1. **Merge datasets** to select relevant stocks.  
 2. **Stage documents** (chunking + embeddings).  
 3. **Run extraction pipeline** to produce structured CSV outputs.  
-4. **Analyze or query structured data** for financial or regulatory insights.
+4. **Visualize semantic relationships**:
+   ```python
+   # Visualize company focus
+   visualize_company_focus(G, "2025-02-19-10k-PFG.html", top_k=5)
 
----
-
-## License
-
-MIT License
+   # Visualize directive focus
+   visualize_directive_focus(G, "2.H.R.1 - One Big Beautiful Bill Act.xml", top_k=5)
+   ```
+    Company focused shows top directive that are influence the company
+    ![img_2.png](img_2.png)
+    Directive focused shows the top-10 most impacted by the directive
+    ![img_1.png](img_1.png)
+5. You can change the directive or company 
+The following is the combined version you can zoom in and out and interact with it based on your preference
+hover on the nodes to see the Ticker, the color determines the semantic similarity.
+    ![img_3.png](img_3.png)
+#### You can also change the similarity level by changing the row["similarity"] variable.
