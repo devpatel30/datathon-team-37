@@ -138,6 +138,12 @@ hover on the nodes to see the Ticker, the color determines the semantic similari
 #### You can also change the similarity level by changing the row["similarity"] variable.
 
 # Build guide
+Prerequesites
+You need aws access-token, secret-access and region and access to AmazonBedRock
+0. Cofigure aws here add all access-token/key, secret-access and region
+```bash
+    aws-configure
+```
 1. Install requirements
 ```bash
   pip install -r requirements.txt
